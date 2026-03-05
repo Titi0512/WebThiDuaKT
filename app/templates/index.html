@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Trang chủ - Hệ thống quản lý khen thưởng{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row justify-content-center text-center my-5">
+        <div class="col-lg-8">
+            <h1 class="display-4 fw-bold text-primary mb-4">
+                <i class="bi bi-award-fill"></i>
+                Hệ thống quản lý khen thưởng
+            </h1>
+            <p class="lead text-muted mb-4">
+                Trường Sĩ quan Chính trị
+            </p>
+            <p class="mb-4">
+                Hệ thống quản lý toàn diện các danh hiệu thi đua và hình thức khen thưởng. 
+                Quy trình xét duyệt minh bạch, tra cứu dễ dàng, báo cáo chi tiết.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="/dashboard" class="btn btn-primary btn-lg px-4 me-md-2">
+                    <i class="bi bi-speedometer2 me-2"></i>Vào Dashboard
+                </a>
+                <a href="/ho-so" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-folder-fill me-2"></i>Xem hồ sơ
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row g-4 my-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3">
+                        <i class="bi bi-list-check fs-1"></i>
+                    </div>
+                    <h5 class="card-title">Quản lý danh mục</h5>
+                    <p class="card-text text-muted">
+                        Quản lý đơn vị, danh hiệu thi đua, hình thức khen thưởng
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-success bg-gradient text-white rounded-circle mb-3">
+                        <i class="bi bi-diagram-3 fs-1"></i>
+                    </div>
+                    <h5 class="card-title">Quy trình xét duyệt</h5>
+                    <p class="card-text text-muted">
+                        Trình duyệt nhiều cấp, theo dõi trạng thái realtime
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-info bg-gradient text-white rounded-circle mb-3">
+                        <i class="bi bi-search fs-1"></i>
+                    </div>
+                    <h5 class="card-title">Tìm kiếm tra cứu</h5>
+                    <p class="card-text text-muted">
+                        Tra cứu theo nhiều tiêu chí: tên, đơn vị, năm, hình thức
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon bg-warning bg-gradient text-white rounded-circle mb-3">
+                        <i class="bi bi-bar-chart-fill fs-1"></i>
+                    </div>
+                    <h5 class="card-title">Báo cáo thống kê</h5>
+                    <p class="card-text text-muted">
+                        Thống kê chi tiết, xuất báo cáo Word/PDF/Excel
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-4 my-5" id="quickStats">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Thống kê tổng quan</h3>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Tổng hồ sơ</h6>
+                    <h2 class="card-title mb-0" id="totalRecords">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Chờ duyệt</h6>
+                    <h2 class="card-title mb-0" id="pendingRecords">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Đã duyệt</h6>
+                    <h2 class="card-title mb-0" id="approvedRecords">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 opacity-75">Đơn vị</h6>
+                    <h2 class="card-title mb-0" id="totalUnits">0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load quick stats
+async function loadQuickStats() {
+    try {
+        const response = await apiCall('/thong-ke/dashboard');
+        if (response) {
+            document.getElementById('totalRecords').textContent = response.total_records || 0;
+            document.getElementById('pendingRecords').textContent = response.pending_approval || 0;
+            document.getElementById('approvedRecords').textContent = response.approved || 0;
+            document.getElementById('totalUnits').textContent = response.total_units || 0;
+        }
+    } catch (error) {
+        console.log('Not logged in or error loading stats');
+    }
+}
+
+// Load stats on page load if logged in
+if (localStorage.getItem('token')) {
+    loadQuickStats();
+}
+</script>
+{% endblock %}

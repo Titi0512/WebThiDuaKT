@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý danh mục{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-list-ul me-2"></i>Quản lý danh mục</h2>
+    
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#donViTab">
+                <i class="bi bi-building me-2"></i>Đơn vị
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#danhHieuTab">
+                <i class="bi bi-award me-2"></i>Danh hiệu thi đua
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#hinhThucTab">
+                <i class="bi bi-star me-2"></i>Hình thức khen thưởng
+            </a>
+        </li>
+    </ul>
+    
+    <div class="tab-content">
+        <!-- Đơn vị Tab -->
+        <div class="tab-pane fade show active" id="donViTab">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Danh sách đơn vị</h5>
+                    <button class="btn btn-primary btn-sm" onclick="openDonViModal()">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm đơn vị
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Mã đơn vị</th>
+                                    <th>Tên đơn vị</th>
+                                    <th>Loại</th>
+                                    <th>Thứ tự</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="donViTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Danh hiệu Tab -->
+        <div class="tab-pane fade" id="danhHieuTab">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Danh sách danh hiệu thi đua</h5>
+                    <button class="btn btn-primary btn-sm" onclick="openDanhHieuModal()">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm danh hiệu
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Mã danh hiệu</th>
+                                    <th>Tên danh hiệu</th>
+                                    <th>Cấp khen thưởng</th>
+                                    <th>Thứ tự</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="danhHieuTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hình thức Tab -->
+        <div class="tab-pane fade" id="hinhThucTab">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Danh sách hình thức khen thưởng</h5>
+                    <button class="btn btn-primary btn-sm" onclick="openHinhThucModal()">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm hình thức
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Mã hình thức</th>
+                                    <th>Tên hình thức</th>
+                                    <th>Mức thưởng</th>
+                                    <th>Cấp khen thưởng</th>
+                                    <th>Thứ tự</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hinhThucTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/danh_muc.js"></script>
+{% endblock %}

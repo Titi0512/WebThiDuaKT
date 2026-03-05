@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý tài khoản{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-people me-2"></i>Quản lý tài khoản</h2>
+    
+    <div class="card">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="row g-2">
+                        <!-- Filter by Role -->
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="filterRole">
+                                <option value="">Tất cả vai trò</option>
+                                <option value="admin">Quản trị viên</option>
+                                <option value="lanh_dao">Lãnh đạo</option>
+                                <option value="can_bo">Cán bộ</option>
+                                <option value="user">Người dùng</option>
+                                <option value="view_only">Chỉ xem</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filter by Unit -->
+                        <div class="col-md-4">
+                            <select class="form-select form-select-sm" id="filterUnit">
+                                <option value="">Tất cả đơn vị</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filter by Status -->
+                        <div class="col-md-3">
+                            <select class="form-select form-select-sm" id="filterStatus">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="active">Đang hoạt động</option>
+                                <option value="inactive">Đã khóa</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Search -->
+                        <div class="col-md-2">
+                            <button class="btn btn-primary btn-sm w-100" onclick="loadUsers()">
+                                <i class="bi bi-search me-1"></i>Tìm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary btn-sm" onclick="openUserModal()">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm tài khoản
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tên đăng nhập</th>
+                            <th>Họ tên</th>
+                            <th>Đơn vị</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Email</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Đang tải dữ liệu...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal (Create/Edit) -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalTitle">Thêm tài khoản</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="username" required>
+                            <div class="form-text">Chỉ chữ cái, số và dấu gạch dưới</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3" id="passwordGroup">
+                            <label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="password" required>
+                            <div class="form-text">Tối thiểu 6 ký tự</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="hoTen" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="hoTen" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="capBac" class="form-label">Cấp bậc</label>
+                            <input type="text" class="form-control" id="capBac">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="chucVu" class="form-label">Chức vụ</label>
+                            <input type="text" class="form-control" id="chucVu">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="donViId" class="form-label">Đơn vị <span class="text-danger">*</span></label>
+                            <select class="form-select" id="donViId" required>
+                                <option value="">-- Chọn đơn vị --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="role" class="form-label">Vai trò <span class="text-danger">*</span></label>
+                            <select class="form-select" id="role" required>
+                                <option value="">-- Chọn vai trò --</option>
+                                <option value="admin">Quản trị viên</option>
+                                <option value="lanh_dao">Lãnh đạo</option>
+                                <option value="can_bo">Cán bộ</option>
+                                <option value="user">Người dùng</option>
+                                <option value="view_only">Chỉ xem</option>
+                            </select>
+                            <div class="form-text">
+                                <small>
+                                    <strong>Quản trị viên:</strong> Toàn quyền hệ thống<br>
+                                    <strong>Lãnh đạo:</strong> Xem toàn bộ, phê duyệt<br>
+                                    <strong>Cán bộ:</strong> Quản lý đơn vị<br>
+                                    <strong>Người dùng:</strong> Tạo hồ sơ đơn vị<br>
+                                    <strong>Chỉ xem:</strong> Chỉ xem, không chỉnh sửa
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveUser()">
+                    <i class="bi bi-save me-1"></i>Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Đặt lại mật khẩu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="resetUserId">
+                <p>Đặt lại mật khẩu cho tài khoản: <strong id="resetUsername"></strong></p>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="newPassword" required minlength="6">
+                    <div class="form-text">Tối thiểu 6 ký tự</div>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-warning" onclick="resetPassword()">
+                    <i class="bi bi-key me-1"></i>Đặt lại mật khẩu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteUserId">
+                <p>Bạn có chắc chắn muốn xóa tài khoản: <strong id="deleteUsername"></strong>?</p>
+                <p class="text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="bi bi-trash me-1"></i>Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/users.js"></script>
+{% endblock %}

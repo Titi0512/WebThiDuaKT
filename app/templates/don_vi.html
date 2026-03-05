@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý đơn vị{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2><i class="bi bi-building me-2"></i>Quản lý đơn vị</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <i class="bi bi-plus-circle me-2"></i>Thêm đơn vị
+            </button>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <label for="filterLoai" class="form-label">
+                        <i class="bi bi-filter me-2"></i>Lọc theo loại
+                    </label>
+                    <select class="form-select" id="filterLoai" onchange="loadDonVi()">
+                        <option value="">Tất cả loại đơn vị</option>
+                        <option value="khoi_co_quan">Khối cơ quan</option>
+                        <option value="khoa">Khoa</option>
+                        <option value="don_vi_truc_thuoc">Đơn vị trực thuộc</option>
+                    </select>
+                </div>
+                <div class="col-md-8 text-end">
+                    <button class="btn btn-outline-secondary" onclick="loadDonVi()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Tải lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tables by category -->
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Khối cơ quan</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="khoiCoQuanList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Các khoa</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="khoaList"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Đơn vị trực thuộc</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" id="donViTrucThuocList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Create/Edit Don Vi -->
+<div class="modal fade" id="donViModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm đơn vị</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="donViForm">
+                    <input type="hidden" id="donViId">
+                    
+                    <div class="mb-3">
+                        <label for="maDonVi" class="form-label">Mã đơn vị <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="maDonVi" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tenDonVi" class="form-label">Tên đơn vị <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="tenDonVi" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="loaiDonVi" class="form-label">Loại đơn vị <span class="text-danger">*</span></label>
+                        <select class="form-select" id="loaiDonVi" required>
+                            <option value="">Chọn loại đơn vị</option>
+                            <option value="khoi_co_quan">Khối cơ quan</option>
+                            <option value="khoa">Khoa</option>
+                            <option value="don_vi_truc_thuoc">Đơn vị trực thuộc</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="moTa" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="moTa" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Hủy
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveDonVi()">
+                    <i class="bi bi-check-circle me-2"></i>Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đơn vị này không?</p>
+                <p class="text-danger"><strong>Lưu ý:</strong> Thao tác này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="bi bi-trash me-2"></i>Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/don_vi.js"></script>
+{% endblock %}

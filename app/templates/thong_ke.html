@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Thống kê báo cáo{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-bar-chart-fill me-2"></i>Thống kê & Báo cáo</h2>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Năm</label>
+                    <select class="form-select" id="filterYear" onchange="loadStatistics()">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Đơn vị</label>
+                    <select class="form-select" id="filterUnit" onchange="loadStatistics()">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success flex-fill" onclick="exportExcel()">
+                            <i class="bi bi-file-earmark-excel me-2"></i>
+                            <span class="d-none d-sm-inline">Xuất Excel</span>
+                            <span class="d-inline d-sm-none">Excel</span>
+                        </button>
+                        <button class="btn btn-primary flex-fill" onclick="exportWord()">
+                            <i class="bi bi-file-word me-2"></i>
+                            <span class="d-none d-sm-inline">Xuất Word</span>
+                            <span class="d-inline d-sm-none">Word</span>
+                        </button>
+                        <button class="btn btn-danger flex-fill" onclick="exportPDF()">
+                            <i class="bi bi-file-pdf me-2"></i>
+                            <span class="d-none d-sm-inline">Xuất PDF</span>
+                            <span class="d-inline d-sm-none">PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Thống kê theo đơn vị</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="unitStatsChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Thống kê theo năm</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="yearStatsChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tables -->
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Chi tiết theo đơn vị</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Đơn vị</th>
+                                    <th class="text-center">Cá nhân</th>
+                                    <th class="text-center">Tập thể</th>
+                                    <th class="text-center">Tổng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="unitStatsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Chi tiết theo năm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Năm</th>
+                                    <th class="text-center">Cá nhân</th>
+                                    <th class="text-center">Tập thể</th>
+                                    <th class="text-center">Tổng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yearStatsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/static/js/thong_ke.js"></script>
+{% endblock %}

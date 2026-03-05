@@ -1,0 +1,662 @@
+{% extends "base.html" %}
+
+{% block title %}Đơn vị - Hệ thống quản lý khen thưởng{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Full screen layout - Remove all padding and margins */
+    html, body {
+        overflow-x: hidden;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Override main container for fullscreen */
+    main, main.p-0 {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: calc(100vh - 56px) !important;
+        overflow: hidden;
+    }
+    
+    /* Container inside main should also be full width */
+    .d-flex.page-wrapper {
+        width: 100%;
+        height: calc(100vh - 56px);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    /* Sidebar Styles */
+    .sidebar {
+        height: calc(100vh - 56px);
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 280px;
+        background: #fff;
+        border-right: 2px solid #e9ecef;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 1000;
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    }
+    
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .sidebar-toggle-desktop {
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        transition: color 0.2s;
+    }
+    
+    .sidebar-toggle-desktop:hover {
+        color: #0d6efd;
+    }
+    
+    .sidebar .list-group-item {
+        border-left: 3px solid transparent;
+        border-right: none;
+        border-top: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 0;
+        padding: 0.875rem 1rem;
+    }
+    
+    .sidebar .list-group-item:hover {
+        background: #f8f9fa;
+        border-left-color: #0d6efd;
+        transform: translateX(2px);
+    }
+    
+    .sidebar .list-group-item.active {
+        background: linear-gradient(90deg, #e7f1ff 0%, #f8f9fa 100%);
+        border-left-color: #0d6efd;
+        color: #0d6efd;
+        font-weight: 600;
+        box-shadow: inset 4px 0 0 -1px #0d6efd;
+    }
+    
+    /* Main Content - Fixed height with scroll */
+    .main-content {
+        margin-left: 280px;
+        padding: 1.5rem;
+        transition: margin-left 0.3s ease-in-out;
+        height: calc(100vh - 56px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        width: calc(100% - 280px);
+    }
+    
+    .main-content.expanded {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    /* Mobile Toggle Button */
+    .sidebar-toggle {
+        position: fixed;
+        top: 70px;
+        left: 10px;
+        z-index: 1001;
+        display: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Desktop Show Menu Button - Hiện khi sidebar collapsed */
+    .sidebar-show-btn {
+        position: fixed;
+        top: 70px;
+        left: 10px;
+        z-index: 1001;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-show-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .sidebar-show-btn i {
+        font-size: 1.25rem;
+    }
+    
+    /* Show button when sidebar is collapsed on desktop */
+    .sidebar-show-btn.show {
+        display: flex;
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        height: calc(100vh - 56px);
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    }
+    
+    .sidebar-overlay.show {
+        display: block;
+    }
+    
+    /* Unit Header */
+    .unit-header {
+        background: white;
+        border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .unit-header h3 {
+        margin: 0;
+        color: #212529;
+        font-weight: 600;
+    }
+    
+    .unit-header .text-muted {
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Statistics Cards */
+    .stat-card {
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 150px;
+        height: 150px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .stat-card .card-body {
+        position: relative;
+        z-index: 1;
+        padding: 1.25rem;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-add-record {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-add-record:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Tabs styling */
+    .nav-tabs {
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        font-weight: 500;
+        padding: 0.75rem 1.25rem;
+        transition: all 0.3s ease;
+        background: transparent;
+        margin-bottom: -2px;
+        border-bottom: 2px solid transparent;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-color: transparent;
+        color: #0d6efd;
+        background: rgba(13, 110, 253, 0.05);
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        background: white;
+        border-bottom: 2px solid #0d6efd;
+        font-weight: 600;
+    }
+    
+    /* Badge */
+    .badge-loai {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+        .sidebar {
+            transform: translateX(-100%);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+        }
+        
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding: 1rem;
+        }
+        
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Hide show button on mobile */
+        .sidebar-show-btn {
+            display: none !important;
+        }
+        
+        .stat-card {
+            margin-bottom: 1rem;
+        }
+        
+        .unit-header {
+            padding: 1rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 0.75rem;
+        }
+        
+        .unit-header {
+            padding: 0.875rem 1rem;
+        }
+        
+        .unit-header h3 {
+            font-size: 1.25rem;
+        }
+        
+        .table {
+            font-size: 0.875rem;
+        }
+        
+        .stat-card h2 {
+            font-size: 1.5rem;
+        }
+        
+        .stat-card .card-body {
+            padding: 1rem;
+        }
+        
+        .action-buttons {
+            gap: 0.375rem;
+        }
+        
+        .btn-add-record {
+            font-size: 0.875rem;
+            padding: 0.5rem 0.75rem;
+        }
+    }
+    
+    /* Table improvements */
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .table thead th {
+        background: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        white-space: nowrap;
+    }
+    
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* Better scrollbar */
+    .sidebar::-webkit-scrollbar,
+    .main-content::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track,
+    .main-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb,
+    .main-content::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 3px;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb:hover,
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+</style>
+{% endblock %}
+
+{% block main_class %}p-0{% endblock %}
+
+{% block content %}
+<!-- Sidebar Toggle Button (Mobile) -->
+<button class="btn btn-primary sidebar-toggle" id="sidebarToggle">
+    <i class="bi bi-list"></i>
+</button>
+
+<!-- Show Menu Button (Desktop - hiện khi sidebar ẩn) -->
+<button class="sidebar-show-btn" id="sidebarShowBtn" title="Hiện menu đơn vị">
+    <i class="bi bi-chevron-right"></i>
+</button>
+
+<!-- Sidebar Overlay (Mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="d-flex page-wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom sidebar-header" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">
+                    <i class="bi bi-building me-2 text-primary"></i>
+                    Danh sách đơn vị
+                </h6>
+                <button class="sidebar-toggle-desktop" id="sidebarToggleDesktop" title="Ẩn/Hiện danh sách">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Khối cơ quan -->
+        <div class="border-bottom">
+            <div class="list-group-item bg-light text-muted small fw-bold">
+                <i class="bi bi-layers me-1"></i>KHỐI CƠ QUAN
+            </div>
+            <div id="khoiCoQuanList" class="list-group list-group-flush">
+                <!-- Loaded by JS -->
+            </div>
+        </div>
+        
+        <!-- Các khoa -->
+        <div class="border-bottom">
+            <div class="list-group-item bg-light text-muted small fw-bold">
+                <i class="bi bi-mortarboard me-1"></i>CÁC KHOA
+            </div>
+            <div id="khoaList" class="list-group list-group-flush">
+                <!-- Loaded by JS -->
+            </div>
+        </div>
+        
+        <!-- Đơn vị trực thuộc -->
+        <div>
+            <div class="list-group-item bg-light text-muted small fw-bold">
+                <i class="bi bi-diagram-3 me-1"></i>ĐƠN VỊ TRỰC THUỘC
+            </div>
+            <div id="donViTrucThuocList" class="list-group list-group-flush">
+                <!-- Loaded by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-5">
+            <div class="card border-0 shadow-sm mx-auto" style="max-width: 500px;">
+                <div class="card-body p-5">
+                    <i class="bi bi-building text-primary" style="font-size: 4rem; opacity: 0.5;"></i>
+                    <h4 class="mt-3 mb-2 text-dark">Chọn đơn vị để xem thông tin</h4>
+                    <p class="text-muted mb-0">Vui lòng chọn một đơn vị từ menu bên trái để xem chi tiết hồ sơ khen thưởng</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unit Details -->
+        <div id="unitDetails" style="display: none;">
+            <!-- Unit Header -->
+            <div class="unit-header">
+                <h3 id="unitName">Tên đơn vị</h3>
+                <div class="text-muted">
+                    <span class="badge bg-primary" id="unitCode">Mã</span>
+                    <span id="unitType"><i class="bi bi-tag me-1"></i>Loại đơn vị</span>
+                </div>
+            </div>
+            
+            <!-- Statistics Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm bg-primary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0 opacity-75 small">TỔNG HỒ SƠ</h6>
+                                    <h2 class="mb-0 mt-2 fw-bold" id="totalRecords">
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                    </h2>
+                                </div>
+                                <i class="bi bi-folder-fill" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm bg-success text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0 opacity-75 small">CÁ NHÂN</h6>
+                                    <h2 class="mb-0 mt-2 fw-bold" id="personalRecords">
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                    </h2>
+                                </div>
+                                <i class="bi bi-person-fill" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm bg-info text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0 opacity-75 small">TẬP THỂ</h6>
+                                    <h2 class="mb-0 mt-2 fw-bold" id="collectiveRecords">
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                    </h2>
+                                </div>
+                                <i class="bi bi-people-fill" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card stat-card border-0 shadow-sm bg-warning text-dark h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0 opacity-75 small">ĐÃ DUYỆT</h6>
+                                    <h2 class="mb-0 mt-2 fw-bold" id="approvedRecords">
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                    </h2>
+                                </div>
+                                <i class="bi bi-check-circle-fill" style="font-size: 2.5rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons - Hiển thị mặc định, JS sẽ ẩn nếu không có quyền -->
+            <div class="action-buttons mb-3" id="actionButtons">
+                <button class="btn btn-success btn-add-record shadow-sm" onclick="addPersonalRecord()">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span class="d-none d-sm-inline">Thêm hồ sơ cá nhân</span>
+                    <span class="d-inline d-sm-none">Cá nhân</span>
+                </button>
+                <button class="btn btn-info text-white btn-add-record shadow-sm" onclick="addCollectiveRecord()">
+                    <i class="bi bi-people-fill"></i>
+                    <span class="d-none d-sm-inline">Thêm hồ sơ tập thể</span>
+                    <span class="d-inline d-sm-none">Tập thể</span>
+                </button>
+            </div>
+            
+            <!-- Tabs -->
+            <ul class="nav nav-tabs mb-3 border-0" id="unitTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-top" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab">
+                        <i class="bi bi-person me-2"></i>
+                        <span class="d-none d-sm-inline">Danh sách cá nhân</span>
+                        <span class="d-inline d-sm-none">Cá nhân</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-top" id="collective-tab" data-bs-toggle="tab" data-bs-target="#collective" type="button" role="tab">
+                        <i class="bi bi-people me-2"></i>
+                        <span class="d-none d-sm-inline">Danh sách tập thể</span>
+                        <span class="d-inline d-sm-none">Tập thể</span>
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content" id="unitTabsContent">
+                <!-- Personal Tab -->
+                <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="d-none d-md-table-cell" style="width: 5%;">#</th>
+                                            <th style="width: 15%;">Mã hồ sơ</th>
+                                            <th style="width: 20%;">Họ tên</th>
+                                            <th class="d-none d-lg-table-cell" style="width: 15%;">Chức vụ</th>
+                                            <th class="d-none d-md-table-cell" style="width: 20%;">Danh hiệu/Hình thức</th>
+                                            <th class="d-none d-sm-table-cell" style="width: 10%;">Năm</th>
+                                            <th style="width: 15%;">Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="personalTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <div class="mt-2 text-muted">Đang tải dữ liệu...</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Collective Tab -->
+                <div class="tab-pane fade" id="collective" role="tabpanel">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="d-none d-md-table-cell" style="width: 5%;">#</th>
+                                            <th style="width: 15%;">Mã hồ sơ</th>
+                                            <th style="width: 25%;">Tên tập thể</th>
+                                            <th class="d-none d-md-table-cell" style="width: 20%;">Danh hiệu/Hình thức</th>
+                                            <th class="d-none d-sm-table-cell" style="width: 10%;">Năm</th>
+                                            <th class="d-none d-lg-table-cell" style="width: 10%;">Số lượng</th>
+                                            <th style="width: 15%;">Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="collectiveTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <div class="mt-2 text-muted">Đang tải dữ liệu...</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<!-- No footer on this page for fullscreen experience -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/don_vi_detail.js"></script>
+{% endblock %}
