@@ -1,42 +1,63 @@
+# ============================================================
 # FastAPI and web framework
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
-jinja2==3.1.2
-python-dotenv==1.0.0
+# ============================================================
+fastapi==0.115.6           # Hỗ trợ Pydantic v2 + Python 3.13
+uvicorn[standard]==0.32.1
+python-multipart==0.0.12
+jinja2==3.1.4
+python-dotenv==1.0.1
 
+# ============================================================
 # Database (MariaDB)
-sqlalchemy==2.0.36
-pymysql==1.1.0
-cryptography==41.0.7
+# ============================================================
+sqlalchemy==2.0.36         # Fix lỗi TypingOnly với Python 3.13
+pymysql==1.1.1
+cryptography==43.0.3
 # Alternative MariaDB connector (optional, uncomment if needed):
-# mariadb==1.1.8
+# mariadb==1.1.10
 
+# ============================================================
 # Authentication
+# ============================================================
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-bcrypt==4.1.1
+bcrypt==4.2.1
 
+# ============================================================
 # Data validation
-pydantic
-pydantic-settings==2.1.0
-email-validator==2.1.0
+# ============================================================
+pydantic==2.10.4           # Pydantic v2 ổn định mới nhất
+pydantic-settings==2.7.0
+pydantic-core==2.27.2      # Phải đồng bộ với pydantic
+email-validator==2.2.0
 
-# CORS
-flask-cors
-# Excel/PDF export (optional)
-openpyxl==3.1.2
-reportlab==4.0.7
-xlsxwriter==3.1.9
-python-docx==1.1.0
+# ============================================================
+# CORS (dùng fastapi middleware, không cần flask-cors)
+# ============================================================
+# flask-cors đã bị XÓA vì đây là FastAPI project
+# CORS được xử lý bằng FastAPI built-in CORSMiddleware
 
+# ============================================================
+# Excel/PDF export
+# ============================================================
+openpyxl==3.1.5
+reportlab==4.2.5
+xlsxwriter==3.2.0
+python-docx==1.1.2
+
+# ============================================================
 # Date utilities
-python-dateutil==2.8.2
+# ============================================================
+python-dateutil==2.9.0.post0
 
-# HTTP client (for testing)
-httpx==0.25.2
-requests==2.31.0
+# ============================================================
+# HTTP client
+# ============================================================
+httpx==0.28.1
+requests==2.32.3
 
-# Development tools
-pytest==7.4.3
-pytest-asyncio==0.21.1
+# ============================================================
+# Development & Testing
+# ============================================================
+pytest==8.3.4
+pytest-asyncio==0.24.0
