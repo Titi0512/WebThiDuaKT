@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:8000"]
     
     class Config:
-        env_file = ".env.example"
+        env_file = ".env"
         case_sensitive = True
 
 
